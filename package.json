@@ -1,0 +1,28 @@
+{
+  "name": "deepracing-slack-bot",
+  "version": "1.0.0",
+  "description": "Slack bot for the DeepRacing Slack Community",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/caelinsutch/deepracing-slack-bot.git"
+  },
+  "keywords": [
+    "bot",
+    "slack-bot"
+  ],
+  "author": "Caelin Sutch",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/caelinsutch/deepracing-slack-bot/issues"
+  },
+  "homepage": "https://github.com/caelinsutch/deepracing-slack-bot#readme",
+  "dependencies": {
+    "aws-sdk": "^2.507.0",
+    "serverless-plugin-optimize": "^4.1.0-rc.1",
+    "slack": "^11.0.2"
+  }
+}

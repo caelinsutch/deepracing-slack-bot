@@ -1,6 +1,5 @@
 'use strict';
 
-// const AWS   = require('aws-sdk');
 const Slack = require('slack');
 
 /**
@@ -87,12 +86,12 @@ async function handleMention( message )
         // Gets the command from the message
         let command = parseMessage( message.text );
 
-        // Executes differend commands based in the specified instruction
+        // Executes different commands based in the specified instruction
         switch ( command )
         {
             case 'help':
                 await sendSlackMessage( message.channel,
-                    '')
+                    'Do you need some help? Unfortunately, this bot doesnt do much right now :(, but yu can run \\`@${process.env.BOT_NAME} test\\` to run a DM test!')
             case 'test':
                 await sendSlackMessage( message.channel,
                     `Very cool, thank you for testing me. Now sending you some fun info!` );
@@ -106,10 +105,18 @@ async function handleMention( message )
     }
 }
 
+/**
+ * Sends a welcome message in a DM to the new person
+ * @async
+ * @param user
+ * @return {Promise<void>}
+ */
 async function newTeamMember(user) {
-    console.log('New Team Member Called');
-    console.log(user)
+    // console.log('New Team Member Called');
+    // console.log(user)
     // Send a message to the user:
+    sendSlackMessage(user.id,
+        'Welcome to the DeepRacing Community! This bot is still in testing, so if you got this message, let @caelinsutch know that it worked!')
 
 }
 
@@ -141,36 +148,3 @@ function parseMessage( message )
 {
     return message.split( ' ', 2 ).pop();
 }
-
-// /**
-//  * Creates an invalidation in the configured CloudFront distribution and returns the invalidation ID
-//  * @return {Promise|String}
-//  */
-// function invalidateDistribution()
-// {
-//     const CloudFront = new AWS.CloudFront();
-//
-//     // Invalidation parameters
-//     const params = {
-//         DistributionId: process.env.CDN_DISTRIBUTION,
-//         InvalidationBatch: {
-//             CallerReference: Date.now() + '',
-//             Paths: {
-//                 Quantity: '1',
-//                 Items: [
-//                     '/*'
-//                 ]
-//             }
-//         }
-//     };
-//
-//     return new Promise( ( resolve, reject ) =>
-//     {
-//         // Call the CloudFront wrapper to invalidate the CDN cache
-//         CloudFront.createInvalidation( params, ( err, data ) =>
-//         {
-//             if ( err ) reject( err );
-//             else       resolve( data );
-//         } );
-//     } );
-// }

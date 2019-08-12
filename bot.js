@@ -1,6 +1,6 @@
 'use strict';
 
-const AWS   = require('aws-sdk');
+// const AWS   = require('aws-sdk');
 const Slack = require('slack');
 
 /**
@@ -22,8 +22,6 @@ module.exports.run = async ( data ) =>
     };
 
     try {
-        console.log('Body of request');
-        console.log(dataObject);
         // If the Slack retry header is present, ignore the call to avoid triggering the lambda multiple times
         if ( !( 'X-Slack-Retry-Num' in data.headers ) )
         {
@@ -66,7 +64,7 @@ module.exports.run = async ( data ) =>
  */
 function verifyCall( data )
 {
-    if ( data.token === process.env.VERIFICATION_TOKEN )
+    if ( data.token === '5IyR8BNJJZyQqRgODKGl4ALv' )
     {
         return data.challenge;
     }
@@ -89,24 +87,20 @@ async function handleMention( message )
         // Gets the command from the message
         let command = parseMessage( message.text );
 
-        // Executes different commands based in the specified instruction
+        // Executes differend commands based in the specified instruction
         switch ( command )
         {
             case 'help':
                 await sendSlackMessage( message.channel,
-                    '');
-                break;
+                    '')
             case 'test':
                 await sendSlackMessage( message.channel,
                     `Very cool, thank you for testing me. Now sending you some fun info!` );
                 await sendSlackMessage( message.user, 'You have been tested!');
                 break;
-            case 'hello':
-                await sendSlackMessage(message.channel,
-                    'Hello there!');
             default:
                 await sendSlackMessage( message.channel,
-                    `Thank you for calling me, now run \`@${process.env.BOT_NAME} test\` to test me and report the results` );
+                    `Thank you for calling me, now run \`@${process.env.BOT_NAME} test\` to test me` );
                 break;
         }
     }
@@ -114,9 +108,9 @@ async function handleMention( message )
 
 async function newTeamMember(user) {
     console.log('New Team Member Called');
-    console.log(user);
+    console.log(user)
     // Send a message to the user:
-    sendSlackMessage(user.id, `Welcome to the DeepRacing Community Slack! This bot is still in development, if this worked for you, give @caelinsutch a heads up so he knows everything is working properly!`)
+
 }
 
 /**
@@ -129,7 +123,7 @@ function sendSlackMessage( channel, message )
 {
     console.log('Sending message ' + message + ' to ' + channel);
     const params = {
-        token  : process.env.BOT_TOKEN , // This is the Bot User OAuth Access Token under Oauth and permissions in slack
+        token  : process.env.BOT_TOKEN, // This is the Bot User OAuth Access Token under Oauth and permissions in slack
         channel: channel,
         text   : message
 
@@ -147,3 +141,36 @@ function parseMessage( message )
 {
     return message.split( ' ', 2 ).pop();
 }
+
+// /**
+//  * Creates an invalidation in the configured CloudFront distribution and returns the invalidation ID
+//  * @return {Promise|String}
+//  */
+// function invalidateDistribution()
+// {
+//     const CloudFront = new AWS.CloudFront();
+//
+//     // Invalidation parameters
+//     const params = {
+//         DistributionId: process.env.CDN_DISTRIBUTION,
+//         InvalidationBatch: {
+//             CallerReference: Date.now() + '',
+//             Paths: {
+//                 Quantity: '1',
+//                 Items: [
+//                     '/*'
+//                 ]
+//             }
+//         }
+//     };
+//
+//     return new Promise( ( resolve, reject ) =>
+//     {
+//         // Call the CloudFront wrapper to invalidate the CDN cache
+//         CloudFront.createInvalidation( params, ( err, data ) =>
+//         {
+//             if ( err ) reject( err );
+//             else       resolve( data );
+//         } );
+//     } );
+// }

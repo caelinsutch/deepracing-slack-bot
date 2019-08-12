@@ -22,21 +22,29 @@ module.exports.run = async ( data ) =>
     };
 
     try {
+        console.log('Body of request');
+        console.log(dataObject);
         // If the Slack retry header is present, ignore the call to avoid triggering the lambda multiple times
         if ( !( 'X-Slack-Retry-Num' in data.headers ) )
         {
-            switch ( dataObject.type )
+            // What kind of event is this?
+            switch ( dataObject.event.type )
             {
                 case 'url_verification':
                     response.body = verifyCall( dataObject );
                     break;
-                case 'event_callback':
-                    await handleMessage( dataObject.event );
+                case 'app_mention':
+                    console.log('Handling Mention');
+                    await handleMention( dataObject.event );
                     response.body = { ok: true };
                     break;
+                case 'team_join':
+                    await newTeamMember(dataObject.user);
+                    response.body = { ok: true};
+                    break;
                 default:
-                    response.statusCode = 400,
-                        response.body = 'Empty request';
+                    response.statusCode = 400;
+                    response.body = 'Empty request';
                     break;
             }
         }
@@ -58,7 +66,7 @@ module.exports.run = async ( data ) =>
  */
 function verifyCall( data )
 {
-    if ( data.token === '5IyR8BNJJZyQqRgODKGl4ALv' )
+    if ( data.token === process.env.VERIFICATION_TOKEN )
     {
         return data.challenge;
     }
@@ -72,28 +80,43 @@ function verifyCall( data )
  * @async
  * @param {Object} message The Slack message object
  */
-async function handleMessage( message )
+async function handleMention( message )
 {
+    console.log(message);
     // If bot was mentioned
     if ( !message.bot_id )
     {
         // Gets the command from the message
         let command = parseMessage( message.text );
 
-        // Executes differend commands based in the specified instruction
+        // Executes different commands based in the specified instruction
         switch ( command )
         {
-            case 'invalidate_cdn':
-                const invalidationData = await invalidateDistribution();
+            case 'help':
                 await sendSlackMessage( message.channel,
-                    `Sir/Madam, I've just invalidated the cache, this is the invalidation ID. *${invalidationData.Invalidation.Id}*` );
+                    '');
                 break;
+            case 'test':
+                await sendSlackMessage( message.channel,
+                    `Very cool, thank you for testing me. Now sending you some fun info!` );
+                await sendSlackMessage( message.user, 'You have been tested!');
+                break;
+            case 'hello':
+                await sendSlackMessage(message.channel,
+                    'Hello there!');
             default:
                 await sendSlackMessage( message.channel,
-                    `Sir/Madam, I don't understand what you need. Please use \`@${process.env.BOT_NAME} invalidate_cdn\` to clear the CDN cache.` );
+                    `Thank you for calling me, now run \`@${process.env.BOT_NAME} test\` to test me and report the results` );
                 break;
         }
     }
+}
+
+async function newTeamMember(user) {
+    console.log('New Team Member Called');
+    console.log(user);
+    // Send a message to the user:
+    sendSlackMessage(user.id, `Welcome to the DeepRacing Community Slack! This bot is still in development, if this worked for you, give @caelinsutch a heads up so he knows everything is working properly!`)
 }
 
 /**
@@ -104,8 +127,9 @@ async function handleMessage( message )
  */
 function sendSlackMessage( channel, message )
 {
+    console.log('Sending message ' + message + ' to ' + channel);
     const params = {
-        token  : process.env.BOT_TOKEN,
+        token  : process.env.BOT_TOKEN , // This is the Bot User OAuth Access Token under Oauth and permissions in slack
         channel: channel,
         text   : message
 
@@ -122,37 +146,4 @@ function sendSlackMessage( channel, message )
 function parseMessage( message )
 {
     return message.split( ' ', 2 ).pop();
-}
-
-/**
- * Creates an invalidation in the configured CloudFront distribution and returns the invalidation ID
- * @return {Promise|String}
- */
-function invalidateDistribution()
-{
-    const CloudFront = new AWS.CloudFront();
-
-    // Invalidation parameters
-    const params = {
-        DistributionId: process.env.CDN_DISTRIBUTION,
-        InvalidationBatch: {
-            CallerReference: Date.now() + '',
-            Paths: {
-                Quantity: '1',
-                Items: [
-                    '/*'
-                ]
-            }
-        }
-    };
-
-    return new Promise( ( resolve, reject ) =>
-    {
-        // Call the CloudFront wrapper to invalidate the CDN cache
-        CloudFront.createInvalidation( params, ( err, data ) =>
-        {
-            if ( err ) reject( err );
-            else       resolve( data );
-        } );
-    } );
 }

@@ -64,7 +64,9 @@ functions:
       BOT_NAME        : ${self:custom.botName}
       CDN_DISTRIBUTION: ${self:custom.distributionId}
       VERIFICATION_TOKEN: 5IyR8BNJJZyQqRgODKGl4ALv
-      BOT_TOKEN         : 1c6bbc2d4e3166625b7ac4697775d9d7
+      # Bot oAuth Token
+      BOT_TOKEN         : xoxb-631354281520-722112425152-8s29MTR14abGtsOS8bLAKD0t
+
     exclude:
       - package-lock.json
     optimize: true

@@ -4,7 +4,8 @@
   "description": "Slack bot for the DeepRacing Slack Community",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "sls deploy"
   },
   "repository": {
     "type": "git",

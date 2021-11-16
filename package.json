@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/caelinsutch/deepracing-slack-bot#readme",
   "dependencies": {
-    "aws-sdk": "^2.507.0",
+    "aws-sdk": "^2.814.0",
     "serverless-plugin-optimize": "^4.1.0-rc.1",
     "slack": "^11.0.2"
   }
